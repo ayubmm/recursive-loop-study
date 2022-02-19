@@ -46,7 +46,7 @@ function recursive(arg, index, first = true) {
       };
       arr[cIndex] = res;
     } else if (first) {
-      output[sepProp][index] = parseInt(element.replace(/[^\d]/g, ""));
+      arr[index] = parseInt(element.replace(/[^\d]/g, ""));
     }
   });
   if (first) {
@@ -54,7 +54,7 @@ function recursive(arg, index, first = true) {
   } else {
     return [arr, sepProp, index];
   }
-};
+}
 
 function endOfParentheses(str, times = 0) {
   let n = 0;
