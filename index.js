@@ -1,5 +1,15 @@
-
 const str =
+  "{1122} AND {2012} AND ({2013} OR {2000}) AND ({1133} OR {1112} OR {2011} OR ({1112} WITH {2011}))";
+// expected result = {
+//   and: [
+//     1122,
+//     2012,
+//     { or: [2013, 2000] },
+//     { or: [1133, 1112, 2011, { with: [1112, 2011] }] },
+//   ],
+// };
+
+const str2 =
   "({1133} OR {1112} OR {2011} OR ({1112} WITH {2011})) AND {1122} AND {2012} AND ({2013} OR {2000})";
 // expected result = {
 //   and: [
@@ -13,9 +23,9 @@ const output = {};
 
 function recursive(arg, index, first = true) {
   let startsNested = false;
-  let times = 0;
+  let times = null;
 
-  if (first && arg.charAt(0) === "(") {
+  if (first === true && arg.charAt(0) === "(") {
     startsNested = true;
     times = endOfParentheses(arg);
   }
@@ -32,9 +42,11 @@ function recursive(arg, index, first = true) {
     output[sepProp] = arr;
   }
 
-  arr.forEach((element, index) => {
+  for (let n = 0; n < arr.length; n++) {
+    const element = arr[n];
+
     if (/[a-z]/i.test(element)) {
-      const [cArr, cSepProp, cIndex] = recursive(element, index, false);
+      const [cArr, cSepProp, cIndex] = recursive(element, n, false);
       const res = {
         [cSepProp]: cArr.map((elm) => {
           if (typeof elm !== "object") {
@@ -46,9 +58,10 @@ function recursive(arg, index, first = true) {
       };
       arr[cIndex] = res;
     } else if (first) {
-      arr[index] = parseInt(element.replace(/[^\d]/g, ""));
+      arr[n] = parseInt(element.replace(/[^\d]/g, ""));
     }
-  });
+  }
+
   if (first) {
     return output;
   } else {
@@ -58,10 +71,13 @@ function recursive(arg, index, first = true) {
 
 function endOfParentheses(str, times = 0) {
   let n = 0;
+
   do {
-    if (str.charAt(times) === "(") {
+    const char = str.charAt(times);
+
+    if (char === "(") {
       n++;
-    } else if (str.charAt(times) === ")") {
+    } else if (char === ")") {
       n--;
     }
 
@@ -70,7 +86,8 @@ function endOfParentheses(str, times = 0) {
     }
     times++;
   } while (times < str.length);
+
   return times;
 }
 
-console.log(JSON.stringify(recursive(str)));
+console.log(JSON.stringify(recursive(str), null, 3));
